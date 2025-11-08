@@ -1,11 +1,22 @@
 using Microsoft.EntityFrameworkCore;
 using Backend.Data;
+using Backend.Repositories;
+using Backend.Services;
+using Backend.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddAutoMapper(typeof(Program));
+
 
 // Add Database
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite("Data Source=books.db"));
+
+// Add Repositories
+builder.Services.AddScoped<IBookRepository, BookRepository>();
+
+// Add Services
+builder.Services.AddScoped<IBookService, BookService>();
 
 // Add Controllers
 builder.Services.AddControllers();
@@ -35,6 +46,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseCors("AllowReact");
+app.UseMiddleware<ExceptionMiddleware>();
 app.UseHttpsRedirection();
 
 // Map Controllers

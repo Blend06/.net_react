@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Backend.Models;
-using Backend.Data;
+using Backend.DTOs;
+using Backend.Services;
 
 namespace Backend.Controllers;
 
@@ -9,85 +8,45 @@ namespace Backend.Controllers;
 [Route("api/[controller]")]
 public class BooksController : ControllerBase
 {
-    private readonly AppDbContext _context;
+    private readonly IBookService _bookService;
 
-    public BooksController(AppDbContext context)
+    public BooksController(IBookService bookService)
     {
-        _context = context;
+        _bookService = bookService;
     }
 
-    // GET: api/books
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Book>>> GetBooks()
+    public async Task<ActionResult<IEnumerable<BookDto>>> GetBooks()
     {
-        return await _context.Books.ToListAsync();
+        var books = await _bookService.GetAllBooksAsync();
+        return Ok(books);
     }
 
-    // GET: api/books/5
     [HttpGet("{id}")]
-    public async Task<ActionResult<Book>> GetBook(int id)
+    public async Task<ActionResult<BookDto>> GetBook(int id)
     {
-        var book = await _context.Books.FindAsync(id);
-        if (book == null)
-        {
-            return NotFound();
-        }
+        var book = await _bookService.GetBookByIdAsync(id);
         return Ok(book);
     }
 
-    // POST: api/books
     [HttpPost]
-    public async Task<ActionResult<Book>> CreateBook(Book book)
+    public async Task<ActionResult<BookDto>> CreateBook(CreateBookDto createBookDto)
     {
-        _context.Books.Add(book);
-        await _context.SaveChangesAsync();
+        var book = await _bookService.CreateBookAsync(createBookDto);
         return CreatedAtAction(nameof(GetBook), new { id = book.Id }, book);
     }
 
-    // PUT: api/books/5
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateBook(int id, Book updatedBook)
+    public async Task<IActionResult> UpdateBook(int id, UpdateBookDto updateBookDto)
     {
-        if (id != updatedBook.Id)
-        {
-            return BadRequest();
-        }
-
-        _context.Entry(updatedBook).State = EntityState.Modified;
-
-        try
-        {
-            await _context.SaveChangesAsync();
-        }
-        catch (DbUpdateConcurrencyException)
-        {
-            if (!await BookExists(id))
-            {
-                return NotFound();
-            }
-            throw;
-        }
-
-        return NoContent();
+        var book = await _bookService.UpdateBookAsync(id, updateBookDto);
+        return Ok(book);
     }
 
-    // DELETE: api/books/5
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteBook(int id)
     {
-        var book = await _context.Books.FindAsync(id);
-        if (book == null)
-        {
-            return NotFound();
-        }
-
-        _context.Books.Remove(book);
-        await _context.SaveChangesAsync();
+        await _bookService.DeleteBookAsync(id);
         return NoContent();
-    }
-
-    private async Task<bool> BookExists(int id)
-    {
-        return await _context.Books.AnyAsync(e => e.Id == id);
     }
 }
