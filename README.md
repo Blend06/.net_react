@@ -6,21 +6,6 @@
 **Database Type:** SQLite
 **Location:** Backend/books.db
 
-## Viewing the Database in GUI
-
-You can use any of these tools to view the SQLite database:
-
-1. **DB Browser for SQLite** (Recommended)
-   - Download: https://sqlitebrowser.org/
-   - Open the file: Backend/books.db
-
-2. **VS Code Extension**
-   - Install "SQLite Viewer" or "SQLite" extension
-   - Right-click on books.db and select "Open Database"
-
-3. **DBeaver** (Universal database tool)
-   - Download: https://dbeaver.io/
-
 ## Commands Used to Build This Project
 
 ### Backend Setup
@@ -28,68 +13,89 @@ You can use any of these tools to view the SQLite database:
 ```cmd
 # Create .NET Web API project
 dotnet new webapi -n Backend
-
-# Navigate to Backend folder
 cd Backend
 
-# Install Entity Framework Core packages
+# Install packages
 dotnet add package Microsoft.EntityFrameworkCore.Sqlite
 dotnet add package Microsoft.EntityFrameworkCore.Design
+dotnet add package AutoMapper.Extensions.Microsoft.DependencyInjection
 
-# Install EF Core CLI tools globally
+# Install EF Core CLI tools
 dotnet tool install --global dotnet-ef
 
-# Create initial database migration
+# Create and apply migration
 dotnet ef migrations add InitialCreate
-
-# Apply migration and create database
 dotnet ef database update
-
-# Build the project
-dotnet build
 
 # Run the project
 dotnet run
 ```
 
-### Frontend Setup (Not yet created)
+### Frontend Setup
 
 ```cmd
-# Go back to root directory
 cd ..
-
-# Create React app with Vite
 npm create vite@latest Frontend -- --template react
-
-# Navigate to Frontend folder
 cd Frontend
 
 # Install dependencies
-npm install
+npm install axios react-router-dom react-icons
+npm install -D tailwindcss@3 postcss autoprefixer
 
 # Run development server
 npm run dev
 ```
+
+## Architecture
+
+**Pattern:** N-Layer Architecture with Repository and Service patterns
+
+**Backend Layers:**
+- Controllers - API endpoints (HTTP requests/responses)
+- Services - Business logic and validation
+- Repositories - Data access (database operations)
+- DTOs - Data transfer objects (API input/output)
+- Models - Database entities
+- Middleware - Global exception handling
+- Mappings - AutoMapper profiles
 
 ## Project Structure
 
 ```
 .net_react/
 ├── Backend/
-│   ├── Controllers/
-│   │   └── BooksController.cs
-│   ├── Data/
-│   │   └── AppDbContext.cs
-│   ├── Models/
-│   │   └── Book.cs
-│   ├── Migrations/
-│   ├── Properties/
+│   ├── Controllers/        # API endpoints
+│   ├── Services/          # Business logic
+│   ├── Repositories/      # Data access
+│   ├── DTOs/             # Data transfer objects
+│   ├── Models/           # Database entities
+│   ├── Data/             # DbContext
+│   ├── Middleware/       # Exception handling
+│   ├── Exceptions/       # Custom exceptions
+│   ├── Common/           # Shared utilities
+│   ├── Mappings/         # AutoMapper profiles
+│   ├── Migrations/       # EF Core migrations
 │   ├── Program.cs
-│   ├── Backend.csproj
-│   ├── appsettings.json
 │   └── books.db
-└── Frontend/ (to be created)
+└── Frontend/
+    ├── src/
+    │   ├── components/   # React components
+    │   ├── pages/        # Page components
+    │   ├── services/     # API calls
+    │   └── router.jsx    # Routes
+    └── package.json
 ```
+
+## Backend Components
+
+**Controllers** - Handle HTTP requests, call services, return responses
+**Services** - Business logic, validation, orchestration
+**Repositories** - Database queries using Entity Framework
+**DTOs** - CreateBookDto, UpdateBookDto, BookDto (with validation)
+**Middleware** - ExceptionMiddleware (catches all errors, returns consistent responses)
+**Exceptions** - NotFoundException (404), BadRequestException (400)
+**Common** - ApiResponse wrapper for consistent API responses
+**Mappings** - AutoMapper profiles (Book ↔ DTOs)
 
 ## API Endpoints
 
@@ -113,31 +119,3 @@ Swagger UI: http://localhost:5214/swagger
 | Title  | TEXT    | Book title           |
 | Author | TEXT    | Book author          |
 | Year   | INTEGER | Publication year     |
-
-## Useful EF Core Commands
-
-```cmd
-# Create a new migration
-dotnet ef migrations add MigrationName
-
-# Apply migrations to database
-dotnet ef database update
-
-# Remove last migration (if not applied)
-dotnet ef migrations remove
-
-# View migration SQL
-dotnet ef migrations script
-
-# Drop database
-dotnet ef database drop
-```
-
-## Connection String
-
-Located in Program.cs:
-```
-Data Source=books.db
-```
-
-This creates a SQLite database file named "books.db" in the Backend folder.
