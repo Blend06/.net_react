@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { FaBook } from 'react-icons/fa';
+import { FaBook, FaPersonBooth } from 'react-icons/fa';
 
 function Dashboard() {
   const navigate = useNavigate();
@@ -12,6 +12,13 @@ function Dashboard() {
       icon: FaBook,
       color: 'text-blue-500'
     },
+    { 
+      title: 'Authors', 
+      description: 'Manage authors', 
+      path: '/authors', 
+      icon: FaPersonBooth,
+      color: 'text-blue-500'
+    }
   ];
 
   return (
