@@ -12,5 +12,10 @@ public class MappingProfile : Profile
         CreateMap<Book, BookDto>();
         CreateMap<CreateBookDto, Book>();
         CreateMap<UpdateBookDto, Book>();
+
+        // Author mappings
+        CreateMap<Author, AuthorDto>();
+        CreateMap<CreateAuthorDto, Author>();
+        CreateMap<UpdateAuthorDto, Author>();
     }
 }
